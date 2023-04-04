@@ -1,0 +1,9 @@
+.login__button_disabled {
+    color:black;
+    opacity: .2;
+    cursor: default;
+    background-color: #F7F7F7;
+    border: 1px solid #000000;
+    pointer-events: none;
+  }
+  

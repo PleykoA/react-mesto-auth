@@ -1,0 +1,10 @@
+.profile__edit-info {
+  display: flex;
+}
+
+@media screen and (max-width:645px) {
+  .profile__edit-info {
+    flex-direction: column;
+    justify-self: center;
+  }
+}

@@ -1,0 +1,18 @@
+.profile {
+  max-width: 880px;
+  min-height: 120px;
+  margin: 36.25px auto 50px;
+  display: grid;
+  grid-template-columns: min-content min-content auto;
+  align-items: center;
+  text-overflow: ellipsis;
+}
+
+@media screen and (max-width:645px) {
+  .profile {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    margin: 41.35px auto 36px;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,11 @@
+.form__input-error_active {
+  visibility: visible;
+  max-width: 358px;
+}
+
+@media screen and (max-width:425px) {
+  .form__input-error_active {
+    max-width: 238px;
+  }
+}
+

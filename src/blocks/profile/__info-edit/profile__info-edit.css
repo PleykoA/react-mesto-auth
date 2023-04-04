@@ -1,0 +1,13 @@
+.profile__info-edit {
+  display: flex;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@media screen and (min-width:900px) {
+  .profile__info-edit {
+    justify-content: space-between;
+  }
+
+}

@@ -1,0 +1,15 @@
+.card__delete_disable {
+    background-image: url(../../../../images/delete-btn.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 0;
+    cursor: pointer;
+    width: 18px;
+    height: 19px;
+    position: absolute;
+    top: 20px;
+    right: 21.28px;
+    background-color: transparent;
+    padding: 0;
+    display: none;
+}
