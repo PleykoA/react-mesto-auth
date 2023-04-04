@@ -1,10 +1,14 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
 import ImagePopup from './ImagePopup';
-import React, { useEffect, useState, useCallback } from 'react';
+
 import api from '../utils/Api';
+import { auth } from '../utils/auth';
+
 import CurrentUserContext from '../contexts/CurrentUserContext';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
@@ -14,7 +18,7 @@ import ProtectedRoute from './ProtectedRoute';
 import Login from './Login';
 import Register from './Register';
 import InfoTooltip from './InfoTooltip';
-import { auth } from '../utils/auth';
+
 
 function App() {
 
@@ -35,15 +39,16 @@ function App() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        Promise.all([api.getUserInfoApi(), api.getInitialCards()])
-            .then(([user, cardData]) => {
-                setCurrentUser(user);
-                setCards(cardData)
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }, []);
+        loggedIn &&
+            Promise.all([api.getUserInfoApi(), api.getInitialCards()])
+                .then(([user, cardData]) => {
+                    setCurrentUser(user);
+                    setCards(cardData)
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+    }, [loggedIn]);
 
     function closePopup(evt) {
         if (evt.target.classList.contains('popup_opened')) {
@@ -57,70 +62,65 @@ function App() {
         }
     };
 
-    const handleLogin = useCallback(
-        (email, password) => {
+    useEffect(() => {
+        const jwt = localStorage.getItem("jwt");
+        if (jwt) {
             auth
-                .authorize(email, password)
-                .then((data) => {
-                    if (data.token) {
-                        localStorage.setItem('jwt', data.token);
+                .checkToken(jwt)
+                .then((res) => {
+                    if (res) {
                         setLoggedIn(true);
-                        setEmail(email);
-                        navigate('/sign-in', { replace: true });
+                        navigate("/");
+                        setEmail(res.data.email);
                     }
                 })
-                .catch((err) => {
-                    console.log(err);
-                });
-        },
-        [navigate]
-    );
-    const handleRegistration = useCallback(
-        (email, password) => {
-            auth
-                .register(email, password)
-                .then((res) => {
-                    handleSuccessfulRegistration();
-                    localStorage.setItem('jwt', res.jwt);
-                    setLoggedIn(true);
-                    setEmail(email);
-                    navigate('/', { replace: true });
-                    return res;
-                })
-                .catch((err) => {
-                    handleFailedRegistration();
-                    console.log(err);
-                })
-                .finally(() => {
-                    handleInfoTooltipClick();
-                });
-        },
-        [navigate]
-    );
+                .catch((err) => console.log(err));
+        }
+    }, []);
 
-    const checkToken = useCallback(() => {
-        const token = localStorage.getItem('jwt');
+    const handleSignOut = () => {
+        setEmail("");
+        localStorage.removeItem("jwt");
+    };
+    const handleRegister = (values) => {
+        if (!values.email || !values.password) {
+            return;
+        }
         auth
-            .getContent(token)
+            .register(values.email, values.password)
             .then((res) => {
-                if (res) {
+                
+                setIsInfoTooltipOpen((prev) => !prev);
+                navigate("/sign-in", { replace: true });
+            })
+            .catch((err) => {
+              
+                setIsInfoTooltipOpen((prev) => !prev);
+                console.log(err);
+            });
+    };
+
+    const handleLogin = (values) => {
+        if (!values.email || !values.password) {
+            return;
+        }
+        auth
+            .authorize(values.email, values.password)
+            .then((data) => {
+                if (data.token) {
                     setLoggedIn(true);
-                    setEmail(res.data.email);
+                    localStorage.setItem("jwt", data.token);
+                    setEmail(values.email);
+                    navigate("/");
                 }
             })
             .catch((err) => {
+              
+                setIsInfoTooltipOpen((prev) => !prev);
                 console.log(err);
             });
-    }, []);
+    };
 
-    useEffect(() => {
-        checkToken();
-    }, [checkToken]);
-
-    const signOut = useCallback(() => {
-        setLoggedIn(false);
-        localStorage.removeItem('jwt');
-    }, []);
 
 
     useEffect(() => {
@@ -142,17 +142,7 @@ function App() {
         setSelectedCard(null);
     }
 
-    function handleSuccessfulRegistration() {
-        setSuccess(true);
-    }
 
-    function handleFailedRegistration() {
-        setSuccess(false);
-    }
-
-    function handleInfoTooltipClick() {
-        setIsInfoTooltipOpen(true);
-    }
 
     function handleCardClick(card) {
         setSelectedCard(card);
@@ -276,7 +266,7 @@ function App() {
         <div className='page'>
             <CurrentUserContext.Provider value={currentUser}>
                 <Header email={email}
-                    onSignOut={signOut}
+                    onSignOut={handleSignOut}
                     title='Выйти'
                     loggedIn={loggedIn} />
                 <Routes>
@@ -298,7 +288,7 @@ function App() {
                     />
                     <Route
                         path='/sign-up'
-                        element={<Register onRegister={handleRegistration} />}
+                        element={<Register onRegister={handleRegister} />}
                     />
                     <Route
                         path='/sign-in'
