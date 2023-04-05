@@ -57,9 +57,9 @@ function Register({ onRegister }) {
                 </span>
 
                 <button
-                    className={`login__button ${isValid ? `login__button_disabled` : ``}`} //возможно, нужно поменять ''
+                    className={`login__button ${!isValid ? `login__button_disabled` : ``}`}
                     type='submit'
-                >
+                > Зарегистрироваться
                 </button>
 
             </form>

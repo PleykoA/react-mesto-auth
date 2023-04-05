@@ -61,10 +61,10 @@ function Login({ onLogin, loggedIn }) {
                 </span>
 
                 <button
-                    className={`login__button ${isValid ? `login__button_disabled` : ``}`} //возможно, нужно поменять ''
+                    className={`login__button ${!isValid ? `login__button_disabled` : ``}`}
                     type='submit'
                 >
-                    </button>
+                    Войти</button>
             </form>
         </section>
     );

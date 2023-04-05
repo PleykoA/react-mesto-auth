@@ -1,49 +1,40 @@
-class Api {
-    constructor({ url }) {
-        this._url = url;
+export const base_url = "https://auth.nomoreparties.co";
+
+function sendRequest(url, method, body, token) {
+    const headers = {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
     }
-    response(res) {
+
+    const config = {
+        method,
+        headers,
+    };
+
+    if (body) {
+        config.body = JSON.stringify(body);
+    }
+
+    return fetch(`${base_url}${url}`, config).then((res) => {
         if (res.ok) {
             return res.json();
         }
         return Promise.reject(`Ошибка: ${res.status}`);
-    }
-
-    register(email, password) {
-        return fetch(`${this._url}/signup`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        }).then((response) => {
-            return this.response(response);
-        });
-    };
-
-    authorize(email, password) {
-        return fetch(`${this._url}/signin`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-        }).then((response) =>
-            this.response(response));
-    };
-
-    checkToken(token) {
-        return fetch(`${this._url}/users/me`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-        }).then((res) =>
-            this.response(res));
-    };
+    });
+}
+export function register(email, password) {
+    return sendRequest("/signup", "POST", { email, password });
 }
 
-export const auth = new Api({
-    url: 'https://auth.nomoreparties.co',
-});
+export function authorize(email, password) {
+    return sendRequest("/signin", "POST", { email, password });
+}
+
+export function getContent(token) {
+    return sendRequest("/users/me", "GET", undefined, token);
+}
+
