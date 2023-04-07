@@ -7,7 +7,6 @@ function InfoTooltip({ isOpen, onClose, isSignedUp }) {
         <section
             className={isOpen ? 'popup popup_opened' : 'popup'}
             name='infotooltip'
-            isOpen={isOpen}
             onClick={onClose}
         >
 

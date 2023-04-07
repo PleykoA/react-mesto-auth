@@ -68,7 +68,7 @@ function App() {
                 }
             })
             .catch((err) => {
-                setEnter(false)
+                setInfoTTOpen(true)
                 console.log(err);
             })
     }
@@ -93,9 +93,10 @@ function App() {
     }
 
     function checkToken() {
-        if (localStorage.getItem("jwt")) {
+        const token = localStorage.getItem("jwt")
+        if (token) {
             auth
-                .getToken(localStorage.getItem('jwt'))
+                .getToken(token)
                 .then((res) => {
                     if (res) {
                         setLoggedIn(true);
