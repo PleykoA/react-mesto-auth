@@ -34,15 +34,16 @@ function App() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        Promise.all([api.getUserInfoApi(), api.getInitialCards()])
-            .then(([user, cardData]) => {
-                setCurrentUser(user);
-                setCards(cardData)
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }, []);
+        loggedIn &&
+            Promise.all([api.getUserInfoApi(), api.getInitialCards()])
+                .then(([user, cardData]) => {
+                    setCurrentUser(user);
+                    setCards(cardData)
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+    }, [loggedIn]);
 
     function closePopup(evt) {
         if (evt.target.classList.contains('popup_opened')) {
@@ -67,8 +68,9 @@ function App() {
                 }
             })
             .catch((err) => {
+                setEnter(false)
                 console.log(err);
-            });
+            })
     }
 
     function handleRegister(email, password) {
@@ -91,18 +93,20 @@ function App() {
     }
 
     function checkToken() {
-        auth
-            .getToken(localStorage.getItem('jwt'))
-            .then((res) => {
-                if (res) {
-                    setLoggedIn(true);
-                    setEmailUser(res.data.email);
-                    navigate('/');
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        if (localStorage.getItem("jwt")) {
+            auth
+                .getToken(localStorage.getItem('jwt'))
+                .then((res) => {
+                    if (res) {
+                        setLoggedIn(true);
+                        setEmailUser(res.data.email);
+                        navigate('/');
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
     }
     useEffect(() => {
         checkToken();
@@ -268,29 +272,6 @@ function App() {
                             <Header title='Войти' link='/sign-in' />
                             <Register onRegister={handleRegister} />
                         </>}
-                    />
-                    <Route path='/mesto-react-auth'
-                        element={
-                            <>
-                                <Header
-                                    title='Выйти'
-                                    email={email}
-                                    loggedIn={loggedIn}
-                                    onSignOut={handleSingOut}
-                                />
-                                <ProtectedRoute
-                                    element={Main}
-                                    loggedIn={loggedIn}
-                                    editProfile={handleEditProfileClick}
-                                    addPlace={handleAddPlaceClick}
-                                    editAvatar={handleEditAvatarClick}
-                                    onCardClick={handleCardClick}
-                                    onCardLike={handleCardLike}
-                                    onCardDelete={handleCardDelete}
-                                    cards={cards}
-                                />
-                            </>
-                        }
                     />
                     <Route path='/'
                         element={

@@ -16,7 +16,7 @@ function Register({ onRegister }) {
     }
 
     return (
-        <section className='login'>
+        <div className='login'>
             <p className='login__title'>Регистрация</p>
             <form className='login__form'
                 onSubmit={handleSubmit}>
@@ -66,7 +66,7 @@ function Register({ onRegister }) {
                 Уже зарегистрированы? &nbsp;
                 <Link className='login__signin' to='/sign-in'>Войти</Link>
             </p>
-        </section>
+        </div>
     );
 }
 

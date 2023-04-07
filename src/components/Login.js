@@ -16,7 +16,7 @@ function Login({ onLogin }) {
     }
 
     return (
-        <section className='login'>
+        <div className='login'>
             <p className='login__title'>Вход</p>
             <form className='login__form'
                 onSubmit={handleSubmit}>
@@ -62,7 +62,7 @@ function Login({ onLogin }) {
                 >
                     Войти</button>
             </form>
-        </section>
+        </div>
     );
 }
 
