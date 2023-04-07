@@ -138,8 +138,6 @@ function App() {
         setIsInfoTooltipOpen(true);
     }
 
-
-
     useEffect(() => {
         if (isEditProfilePopupOpen || isEditAvatarPopupOpen || isAddPlacePopupOpen || selectedCard || isDeletePopupOpen) {
             document.addEventListener('keydown', closePopup);
@@ -298,6 +296,30 @@ function App() {
                             <Header title='Войти' link='/sign-in' />
                             <Register onRegister={handleRegister} />
                         </>}
+                    />
+                    <Route
+                        path='/mesto-react-auth'
+                        element={
+                            <>
+                                <Header
+                                    title='Выйти'
+                                    email={email}
+                                    loggedIn={loggedIn}
+                                    onSignOut={handleSignOut}
+                                />
+                                <ProtectedRoute
+                                    element={Main}
+                                    loggedIn={loggedIn}
+                                    editProfile={handleEditProfileClick}
+                                    addPlace={handleAddPlaceClick}
+                                    editAvatar={handleEditAvatarClick}
+                                    onCardClick={handleCardClick}
+                                    onCardLike={handleCardLike}
+                                    onCardDelete={handleCardDelete}
+                                    cards={cards}
+                                />
+                            </>
+                        }
                     />
                     <Route
                         path='/'

@@ -1,7 +1,7 @@
 import React from 'react';
 import Popup from './Popup';
-import successIcon from '../images/success.svg';
-import errorIcon from '../images/error.svg';
+import success from '../images/enter.svg'
+import error from '../images/failed.svg';
 
 function InfoTooltip({ isOpen, onClose, isSignedUp }) {
     return (
@@ -13,14 +13,14 @@ function InfoTooltip({ isOpen, onClose, isSignedUp }) {
                 <>
                     <img
                         className='infotooltip__image'
-                        src={successIcon}
+                        src={success}
                         alt='Регистрация успешно завершена'
                     />
                     <p className='infotooltip__text'>Вы успешно зарегистрировались!</p>
                 </>
             ) : (
                 <>
-                    <img className='infotooltip__image' src={errorIcon} alt='Регистрация не удалась' />
+                    <img className='infotooltip__image' src={error} alt='Регистрация не удалась' />
                     <p className='infotooltip__text'>
                         Что-то пошло не так! Попробуйте ещё раз
                     </p>
