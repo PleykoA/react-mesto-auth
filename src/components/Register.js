@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import useFormValidation from '../utils/useFormValidation';
 
 function Register({ onRegister }) {
-    const { values, handleChange, errors, resetValidation, isValid } =
+    const { values, errors, handleChange, resetValidation, isValid } =
         useFormValidation({});
 
     useEffect(() => {
@@ -12,8 +12,7 @@ function Register({ onRegister }) {
 
     function handleSubmit(evt) {
         evt.preventDefault(evt);
-        const { email, password } = values;
-        onRegister(email, password);
+        onRegister(values);
     }
 
     return (
@@ -25,10 +24,10 @@ function Register({ onRegister }) {
                     className='login__input login__input_item_email'
                     type='email'
                     name='email'
-                    placeholder='Email'
                     value={values.email || ''}
                     onChange={handleChange}
-                    minLength='2'
+                    placeholder='Email'
+                    minLength='5'
                     maxLength='30'
                     required
                 />
@@ -42,11 +41,11 @@ function Register({ onRegister }) {
                     className='login__input login__input_item_password'
                     type='password'
                     name='password'
-                    placeholder='Пароль'
                     value={values.password || ''}
                     onChange={handleChange}
-                    minLength='7'
-                    maxLength='14'
+                    placeholder='Пароль'
+                    minLength='5'
+                    maxLength='30'
                     required
                 />
                 <span
@@ -57,7 +56,7 @@ function Register({ onRegister }) {
                 </span>
 
                 <button
-                    className={`login__button ${!isValid ? `login__button_disabled` : ``}`}
+                    className={`login__submit ${!isValid ? `login__submit_disabled` : ``}`}
                     type='submit'
                 > Зарегистрироваться
                 </button>
@@ -65,9 +64,7 @@ function Register({ onRegister }) {
             </form>
             <p className='login__signup'>
                 Уже зарегистрированы? &nbsp;
-                <Link className='login__signin' to='/sign-in'>
-                    Войти
-                </Link>
+                <Link className='login__signin' to='/sign-in'>Войти</Link>
             </p>
         </section>
     );

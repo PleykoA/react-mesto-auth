@@ -1,8 +1,10 @@
 .login__signin {
     text-decoration: none;
     color: #fff;
-    transition: 0.6s;
     cursor: pointer;
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: 400;
 }
 
 .login__signin:hover {

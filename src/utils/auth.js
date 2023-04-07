@@ -1,40 +1,52 @@
-export const base_url = "https://auth.nomoreparties.co";
-
-function sendRequest(url, method, body, token) {
-    const headers = {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-    };
-
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+class Auth {
+    constructor({ url, headers }) {
+        this._url = url;
+        this._headers = headers;
     }
 
-    const config = {
-        method,
-        headers,
-    };
-
-    if (body) {
-        config.body = JSON.stringify(body);
-    }
-
-    return fetch(`${base_url}${url}`, config).then((res) => {
+    checkResp(res) {
         if (res.ok) {
             return res.json();
         }
         return Promise.reject(`Ошибка: ${res.status}`);
-    });
-}
-export function register(email, password) {
-    return sendRequest("/signup", "POST", { email, password });
+    };
+
+    authorize(email, password) {
+        return fetch(`${this._url}/signin`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        }).then((res) =>
+            this.checkResp(res));
+    }
+
+    register(email, password) {
+        return fetch(`${this._url}/signup`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        }).then((res) =>
+            this.checkResp(res));
+    }
+
+    getToken(token) {
+        return fetch(`${this._url}/users/me`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        }).then((res) =>
+            this.checkResp(res));
+    }
 }
 
-export function authorize(email, password) {
-    return sendRequest("/signin", "POST", { email, password });
-}
+const auth = new Auth({
+    url: 'https://auth.nomoreparties.co',
+});
 
-export function getContent(token) {
-    return sendRequest("/users/me", "GET", undefined, token);
-}
-
+export default auth;

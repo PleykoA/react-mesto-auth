@@ -1,19 +1,16 @@
 import { Route, Routes, useNavigate } from 'react-router-dom';
-import React, { useEffect, useState, useCallback } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
 import ImagePopup from './ImagePopup';
-
 import api from '../utils/Api';
-import * as auth from '../utils/auth';
-
 import CurrentUserContext from '../contexts/CurrentUserContext';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import PopupWithConfirmation from './PopupWithConfirmation';
+import auth from '../utils/auth.js';
 import ProtectedRoute from './ProtectedRoute';
 import Login from './Login';
 import Register from './Register';
@@ -30,11 +27,10 @@ function App() {
     const [cardToDelete, setCardToDelete] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
-    const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
+    const [isInfoTooltipOpen, setInfoTTOpen] = useState(false);
     const [loggedIn, setLoggedIn] = useState(false);
-    const [email, setEmail] = useState('');
-    const [success, setSuccess] = useState(false);
-
+    const [email, setEmailUser] = useState('');
+    const [enter, setEnter] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -60,86 +56,65 @@ function App() {
         }
     };
 
-    const handleLogin = useCallback(
-        (email, password) => {
-            auth
-                .authorize(email, password)
-                .then((data) => {
-                    if (data.token) {
-                        localStorage.setItem('jwt', data.token);
-                        setLoggedIn(true);
-                        setEmail(email);
-                        navigate('/sign-in', { replace: true });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        },
-        [navigate]
-    );
-
-    const handleRegister = useCallback(
-        (email, password) => {
-            auth
-                .register(email, password)
-                .then((res) => {
-                    handleSuccessfulRegistration();
-                    localStorage.setItem('jwt', res.jwt);
-                    setLoggedIn(true);
-                    setEmail(email);
-                    navigate('/', { replace: true });
-                    return res;
-                })
-                .catch((err) => {
-                    handleFailedRegistration();
-                    console.log(err);
-                })
-                .finally(() => {
-                    handleInfoTooltipClick();
-                });
-        },
-        [navigate]
-    );
-
-    const checkToken = useCallback(() => {
-        const token = localStorage.getItem('jwt');
+    function handleLogin(email, password) {
         auth
-            .getContent(token)
-            .then((res) => {
-                if (res) {
+            .authorize(email, password)
+            .then((data) => {
+                if (data.token) {
+                    localStorage.setItem('jwt', data.token);
                     setLoggedIn(true);
-                    setEmail(res.data.email);
+                    navigate('/sign-in', { replace: true });
                 }
             })
             .catch((err) => {
                 console.log(err);
             });
-    }, []);
+    }
 
+    function handleRegister(email, password) {
+        auth
+            .register(email, password)
+            .then((res) => {
+                setEnter(true);
+                localStorage.setItem('jwt', res.jwt);
+                setLoggedIn(true);
+                navigate('/', { replace: true });
+                return res;
+            })
+            .catch((err) => {
+                setEnter(false);
+                console.log(err);
+            })
+            .finally(() => {
+                setInfoTTOpen(true);
+            });
+    }
+
+    function checkToken() {
+        auth
+            .getToken(localStorage.getItem('jwt'))
+            .then((res) => {
+                if (res) {
+                    setLoggedIn(true);
+                    setEmailUser(res.data.email);
+                    navigate('/');
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
     useEffect(() => {
         checkToken();
-    }, [checkToken]);
+    }, [loggedIn]);
 
-    const handleSignOut = useCallback(() => {
+    function handleSingOut() {
         setLoggedIn(false);
         localStorage.removeItem('jwt');
-    }, []);
-
-    function handleSuccessfulRegistration() {
-        setSuccess(true);
-    }
-
-    function handleFailedRegistration() {
-        setSuccess(false);
-    }
-
-    function handleInfoTooltipClick() {
-        setIsInfoTooltipOpen(true);
     }
 
     useEffect(() => {
-        if (isEditProfilePopupOpen || isEditAvatarPopupOpen || isAddPlacePopupOpen || selectedCard || isDeletePopupOpen) {
+        if (isEditProfilePopupOpen || isEditAvatarPopupOpen || isAddPlacePopupOpen || selectedCard || isDeletePopupOpen || isInfoTooltipOpen) {
             document.addEventListener('keydown', closePopup);
             document.addEventListener('mousedown', closePopup);
         }
@@ -155,9 +130,8 @@ function App() {
         setIsAddPlacePopupOpen(false);
         setIsDeletePopupOpen(false);
         setSelectedCard(null);
-        setIsInfoTooltipOpen(false);
+        setInfoTTOpen(false);
     }
-
 
     function handleCardClick(card) {
         setSelectedCard(card);
@@ -281,8 +255,7 @@ function App() {
         <div className='page'>
             <CurrentUserContext.Provider value={currentUser}>
                 <Routes>
-                    <Route
-                        path='/sign-in'
+                    <Route path='/sign-in'
                         element={
                             <>
                                 <Header title='Регистрация' link='/sign-up' />
@@ -290,22 +263,20 @@ function App() {
                             </>
                         }
                     />
-                    <Route
-                        path='/sign-up'
+                    <Route path='/sign-up'
                         element={<>
                             <Header title='Войти' link='/sign-in' />
                             <Register onRegister={handleRegister} />
                         </>}
                     />
-                    <Route
-                        path='/mesto-react-auth'
+                    <Route path='/mesto-react-auth'
                         element={
                             <>
                                 <Header
                                     title='Выйти'
                                     email={email}
                                     loggedIn={loggedIn}
-                                    onSignOut={handleSignOut}
+                                    onSignOut={handleSingOut}
                                 />
                                 <ProtectedRoute
                                     element={Main}
@@ -321,15 +292,14 @@ function App() {
                             </>
                         }
                     />
-                    <Route
-                        path='/'
+                    <Route path='/'
                         element={
                             <>
                                 <Header
                                     title='Выйти'
                                     email={email}
                                     loggedIn={loggedIn}
-                                    onSignOut={handleSignOut}
+                                    onSignOut={handleSingOut}
                                 />
                                 <ProtectedRoute
                                     element={Main}
@@ -386,7 +356,7 @@ function App() {
                 <InfoTooltip
                     isOpen={isInfoTooltipOpen}
                     onClose={closeAllPopups}
-                    isSignedUp={success}
+                    isSignedUp={enter}
                 />
             </CurrentUserContext.Provider>
         </div>
