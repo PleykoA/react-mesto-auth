@@ -64,23 +64,24 @@ function App() {
                 if (data.token) {
                     localStorage.setItem('jwt', data.token);
                     setLoggedIn(true);
-                    navigate('/sign-in', { replace: true });
+                    navigate('/', { replace: true });
                 }
             })
             .catch((err) => {
-                setInfoTTOpen(true)
+                setInfoTTOpen(true) 
+                setEnter(false)
                 console.log(err);
             })
     }
 
-    function handleRegister(email, password) {
+    function handleRegister(values) {
         auth
-            .register(email, password)
+            .register(values.email, values.password)
             .then((res) => {
                 setEnter(true);
                 localStorage.setItem('jwt', res.jwt);
                 setLoggedIn(true);
-                navigate('/', { replace: true });
+                navigate('/sign-in', { replace: true });
                 return res;
             })
             .catch((err) => {
