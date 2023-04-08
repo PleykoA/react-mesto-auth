@@ -78,17 +78,26 @@ function App() {
         auth
             .register(values.email, values.password)
             .then((res) => {
-                setEnter(true);
+                handleSuccessReg()
                 localStorage.setItem('jwt', res.jwt);
                 setLoggedIn(true);
                 navigate('/sign-in', { replace: true });
-                setInfoTTOpen(true)
+                console.log(res);
             })
             .catch((err) => {
-                setInfoTTOpen(true)
-                setEnter(false);
+                handleFailReg();
                 console.log(err);
             })
+            .finally(() =>
+                setInfoTTOpen(true));
+    }
+
+    function handleSuccessReg() {
+        setEnter(true);
+    }
+
+    function handleFailReg() {
+        setEnter(false);
     }
 
     function checkToken() {
