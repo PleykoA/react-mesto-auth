@@ -68,7 +68,7 @@ function App() {
                 }
             })
             .catch((err) => {
-                setInfoTTOpen(true) 
+                setInfoTTOpen(true)
                 setEnter(false)
                 console.log(err);
             })
@@ -82,15 +82,13 @@ function App() {
                 localStorage.setItem('jwt', res.jwt);
                 setLoggedIn(true);
                 navigate('/sign-in', { replace: true });
-                return res;
+                setInfoTTOpen(true)
             })
             .catch((err) => {
+                setInfoTTOpen(true)
                 setEnter(false);
                 console.log(err);
             })
-            .finally(() => {
-                setInfoTTOpen(true);
-            });
     }
 
     function checkToken() {
